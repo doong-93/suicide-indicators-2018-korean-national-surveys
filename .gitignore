@@ -1,0 +1,16 @@
+config/paths.local.sas
+outputs/*
+!outputs/.gitkeep
+data/
+*.sas7bdat
+*.sas7bcat
+*.dta
+*.sav
+*.xlsx
+*.xls
+*.csv
+*.log
+*.lst
+*.html
+*.pdf
+.DS_Store

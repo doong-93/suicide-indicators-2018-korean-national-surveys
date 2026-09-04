@@ -1,0 +1,26 @@
+/* Set this to the absolute directory containing run_all.sas. */
+%let PROJECT_ROOT=.;
+options locale=en_US validvarname=v7;
+%if not %sysfunc(fileexist(&PROJECT_ROOT/config/paths.local.sas)) %then %do;
+  %put ERROR: Copy config/paths.example.sas to config/paths.local.sas and set input paths.;
+  %abort cancel;
+%end;
+%include "&PROJECT_ROOT/config/paths.local.sas";
+data _null_;
+  length parent created $2048;
+  parent=symget('OUTPUT_ROOT');
+  if not fileexist(parent) then created=dcreate('outputs',symget('PROJECT_ROOT'));
+  created=dcreate(cats('run_',put(datetime(),hex16.)),parent);
+  if missing(created) then do;
+    put 'ERROR: Cannot create a new output directory.';
+    abort cancel;
+  end;
+  call symputx('RUN_DIR',created,'G');
+run;
+ods html5 path="&RUN_DIR" file='analysis.html';
+ods graphics on;
+%include "&PROJECT_ROOT/sas/00_helpers.sas";
+%include "&PROJECT_ROOT/sas/01_analysis.sas";
+ods graphics off;
+ods html5 close;
+title; footnote;
